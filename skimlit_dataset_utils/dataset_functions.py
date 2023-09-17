@@ -136,14 +136,14 @@ def prefetched_datasets(raw_data,batch_size = 32):
   one_hot_encodings = get_one_hot_encodings(raw_data= raw_data)
 
   # line numbers one hot label
-  training_line_numbers_one_hot = get_one_hot_encodings["line_number"]["train"]
-  validation_line_numbers_one_hot = get_one_hot_encodings["line_number"]["validation"]
-  test_line_numbers_one_hot = get_one_hot_encodings["line_number"]["test"]
+  training_line_numbers_one_hot = one_hot_encodings["line_number"]["train"]
+  validation_line_numbers_one_hot = one_hot_encodings["line_number"]["validation"]
+  test_line_numbers_one_hot = one_hot_encodings["line_number"]["test"]
 
   # total lines one hot label
-  training_total_lines_one_hot = get_one_hot_encodings["total_lines"]["train"]
-  validation_total_lines_one_hot = get_one_hot_encodings["total_lines"]["validation"]
-  test_total_lines_one_hot = get_one_hot_encodings["total_lines"]["test"]
+  training_total_lines_one_hot = one_hot_encodings["total_lines"]["train"]
+  validation_total_lines_one_hot = one_hot_encodings["total_lines"]["validation"]
+  test_total_lines_one_hot = one_hot_encodings["total_lines"]["test"]
 
   # create prefetch training dataset
   train_char_token_pos_data = tf.data.Dataset.from_tensor_slices((training_line_numbers_one_hot,training_total_lines_one_hot,training_sentences,training_chars))
