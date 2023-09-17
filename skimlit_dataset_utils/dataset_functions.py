@@ -119,7 +119,7 @@ def get_one_hot_encodings(raw_data):
     }
   }
 
-def prefetched_datasets(raw_data,batch_size = 32):
+def get_prefetched_datasets(raw_data,batch_size = 32):
   # retrieve the labels
   dataset_one_hot_labels = get_dataset_labels(raw_data=raw_data)
   training_one_hot_labels, validation_one_hot_labels, test_one_hot_labels = dataset_one_hot_labels["training_one_hot_labels"], dataset_one_hot_labels["validation_one_hot_labels"], dataset_one_hot_labels["test_one_hot_labels"]
