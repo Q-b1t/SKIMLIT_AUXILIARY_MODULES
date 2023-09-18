@@ -23,7 +23,7 @@ def skimlit_model_mk_I(truncation_params,char_samples):
     )
 
     char_vectorizer.adapt(char_samples)
-    
+
     char_vocab = char_vectorizer.get_vocabulary()
 
     char_embedding = layers.Embedding(
@@ -37,30 +37,31 @@ def skimlit_model_mk_I(truncation_params,char_samples):
     # token inputs
     token_inputs = layers.Input(shape = [],dtype = "string",name = "token_inputs")
     token_embeddings = use_embedding_layer(token_inputs)
-    token_outputs = layers.Dense(128,activation = "relu")(token_embeddings)
+    token_outputs = layers.Dense(128,activation = "relu",name = "token_layer_1")(token_embeddings)
     token_model = tf.keras.Model(inputs = token_inputs,outputs = token_outputs)
 
     # char inputs
     char_inputs = layers.Input(shape = (1,),dtype = "string", name = "char_inputs")
     char_vectors  = char_vectorizer(char_inputs)
     char_embeddings = char_embedding(char_vectors)
-    char_bi_lstm = layers.Bidirectional(layers.LSTM(24))(char_embeddings)
+    char_bi_lstm = layers.Bidirectional(layers.LSTM(24),name = "char_bidirectional_lstm")(char_embeddings)
     char_model = tf.keras.Model(inputs = char_inputs,outputs = char_bi_lstm)
 
     # line numbers model
     line_number_inputs = layers.Input(shape = (line_number_truncation,),dtype = tf.float32,name = "line_number_input")
-    x = layers.Dense(34,activation = "relu")(line_number_inputs)
+    x = layers.Dense(34,activation = "relu",name = "line_number_dense_1")(line_number_inputs)
     line_number_model = tf.keras.Model(inputs = line_number_inputs,outputs = x)
 
     # total lines model
     total_lines_inputs = layers.Input(shape = (total_lines_truncation,),dtype = tf.float32, name = "total_lines_input")
-    y = layers.Dense(32,activation = "relu")(total_lines_inputs)
+    y = layers.Dense(32,activation = "relu",name = "total_line_dense_1")(total_lines_inputs)
     total_lines_model = tf.keras.Model(inputs = total_lines_inputs, outputs = y)
 
     # combine token and char embeddings into a hybrid embedding
     combined_embeddings = layers.Concatenate(name = "char_token_hybrid_embedding")([token_model.output,char_model.output])
-    z = layers.Dense(256,activation = "relu")(combined_embeddings)
-    z = layers.Dropout(0.5)(z)
+    z = layers.Dense(256,activation = "relu",name = "char_token_hybrid_dense_1")(combined_embeddings)
+    z = layers.Dropout(0.5,name = "char_token_hybrid_dropout_1")(z)
+    z = layers.Dense(256,activation = "relu",name = "char_token_hybrid_dense_2")(z)
 
     # combine positional embeddings with combined token and char embeddings
     tribrid_embeddings = layers.Concatenate(name = "char_token_positional_embeddings")([line_number_model.output,total_lines_model.output,z])
