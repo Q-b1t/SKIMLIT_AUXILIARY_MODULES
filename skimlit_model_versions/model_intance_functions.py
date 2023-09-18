@@ -6,7 +6,7 @@ import string
 alphabet = string.ascii_lowercase + string.digits + string.punctuation
 NUM_CHAR_TOKENS = len(alphabet) + 2 # space and OOV token
 
-def skimlit_model_mk_I(truncation_params):
+def skimlit_model_mk_I(truncation_params,char_samples):
 
     # truncation measures
     line_number_truncation,total_lines_truncation,output_sequence_char_length = truncation_params["line_number_truncation"],truncation_params["total_lines_truncation"],truncation_params["output_sequence_char_length"]
@@ -22,6 +22,8 @@ def skimlit_model_mk_I(truncation_params):
         name = "char_vectorizer"
     )
 
+    char_vectorizer.adapt(char_samples)
+    
     char_vocab = char_vectorizer.get_vocabulary()
 
     char_embedding = layers.Embedding(
