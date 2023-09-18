@@ -8,14 +8,15 @@ NUM_CHAR_TOKENS = len(alphabet) + 2 # space and OOV token
 
 def get_hyperparameters():
   return {
-      "char_embedding_output_dim": 64,
-      "token_layer_1_hidden_units":128,
-      "char_bidirectional_lstm_hidden_units":64,
+      "char_embedding_output_dim": 25,
+      "token_layer_1_hidden_units":300,
+      "char_bidirectional_lstm_hidden_units":50,
       "line_number_dense_1_hidden_units":64,
       "total_line_dense_1_hidden_units":64,
-      "char_token_hybrid_dense_1_hidden_units":256,
+      "char_token_hybrid_dense_1_hidden_units":350,
       "char_token_hybrid_dropout_1_probability":0.5,
-      "char_token_hybrid_dense_2_hidden_units":256,
+      "char_token_hybrid_dense_2_hidden_units":350,
+      "tribrid_bidirectional_lstm_hidden_units":200,
       "output_layer_hidden_units":5
   }
 
@@ -29,6 +30,7 @@ def skimlit_model_mk_I(hyperparameters,truncation_params,char_samples):
     char_token_hybrid_dense_1_hidden_units = hyperparameters["char_token_hybrid_dense_1_hidden_units"]
     char_token_hybrid_dropout_1_probability = hyperparameters["char_token_hybrid_dropout_1_probability"]
     char_token_hybrid_dense_2_hidden_units = hyperparameters["char_token_hybrid_dense_2_hidden_units"]
+    tribrid_bidirectional_lstm_hidden_units = hyperparameters["tribrid_bidirectional_lstm_hidden_units"]
     output_layer_hidden_units = hyperparameters["output_layer_hidden_units"]
 
     # truncation measures
@@ -89,8 +91,11 @@ def skimlit_model_mk_I(hyperparameters,truncation_params,char_samples):
     # combine positional embeddings with combined token and char embeddings
     tribrid_embeddings = layers.Concatenate(name = "char_token_positional_embeddings")([line_number_model.output,total_lines_model.output,z])
 
+    # bidirectional neural network
+    tribrid_bidirectional_lstm = layers.Bidirectional(layers.LSTM(tribrid_bidirectional_lstm_hidden_units),name = "tribrid_bidirectional_lstm")(tribrid_embeddings)
+
     # create output layer
-    output_layer = layers.Dense(output_layer_hidden_units,activation = "softmax",name = "output_layer")(tribrid_embeddings)
+    output_layer = layers.Dense(output_layer_hidden_units,activation = "softmax",name = "output_layer")(tribrid_bidirectional_lstm)
 
     # put together model with all the inputs
     model = tf.keras.Model(
