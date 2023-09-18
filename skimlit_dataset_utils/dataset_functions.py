@@ -89,9 +89,10 @@ def get_char_length_percentile(training_sentences,percetage = 98):
 def get_trunctation_params(train_df,percentage = 98):
   return int(np.percentile(train_df.line_number,percentage)),int(np.percentile(train_df.total_lines,98))
 
-def get_truncation_values(training_sentences,percentage = 98):
+def get_truncation_values(raw_data,percentage = 98):
+  sentence_data = get_training_sentences(raw_data)
   line_number_truncation,total_lines_truncation = get_trunctation_params(percentage=percentage)
-  output_sequence_char_length = get_char_length_percentile(training_sentences=training_sentences,percetage=percentage)
+  output_sequence_char_length = get_char_length_percentile(training_sentences=sentence_data["training_sentences"],percetage=percentage)
   return {
     "line_number_truncation":line_number_truncation,
     "total_lines_truncation":total_lines_truncation,
