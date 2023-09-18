@@ -81,13 +81,22 @@ def get_chars(sentence_data):
     "test_chars": [split_chars(sentence) for sentence in test_sentences]
   } 
 
-def get_char_length_percentile(training_sentences,percetage = 95):
+def get_char_length_percentile(training_sentences,percetage = 98):
     char_lens = [len(sentence) for sentence in training_sentences]
-    return int(np.percentile(char_lens,95))
+    return int(np.percentile(char_lens,95))  
 
 # get the length to truncate line number and total lines embeddings
 def get_trunctation_params(train_df,percentage = 98):
   return int(np.percentile(train_df.line_number,percentage)),int(np.percentile(train_df.total_lines,98))
+
+def get_truncation_values(training_sentences,percentage = 98):
+  line_number_truncation,total_lines_truncation = get_trunctation_params(percentage=percentage)
+  output_sequence_char_length = get_char_length_percentile(training_sentences=training_sentences,percetage=percentage)
+  return {
+    "line_number_truncation":line_number_truncation,
+    "total_lines_truncation":total_lines_truncation,
+    "output_sequence_char_length":output_sequence_char_length
+  }
 
 # get the training, validatoin, and test one hot encoding for the dataset
 def get_one_hot_encodings(raw_data):
