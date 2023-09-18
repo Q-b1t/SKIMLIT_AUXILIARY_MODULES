@@ -91,11 +91,8 @@ def skimlit_model_mk_I(hyperparameters,truncation_params,char_samples):
     # combine positional embeddings with combined token and char embeddings
     tribrid_embeddings = layers.Concatenate(name = "char_token_positional_embeddings")([line_number_model.output,total_lines_model.output,z])
 
-    # bidirectional neural network
-    tribrid_bidirectional_lstm = layers.Bidirectional(layers.LSTM(tribrid_bidirectional_lstm_hidden_units),name = "tribrid_bidirectional_lstm")(tribrid_embeddings)
-
     # create output layer
-    output_layer = layers.Dense(output_layer_hidden_units,activation = "softmax",name = "output_layer")(tribrid_bidirectional_lstm)
+    output_layer = layers.Dense(output_layer_hidden_units,activation = "softmax",name = "output_layer")(tribrid_embeddings)
 
     # put together model with all the inputs
     model = tf.keras.Model(
