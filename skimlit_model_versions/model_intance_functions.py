@@ -6,7 +6,30 @@ import string
 alphabet = string.ascii_lowercase + string.digits + string.punctuation
 NUM_CHAR_TOKENS = len(alphabet) + 2 # space and OOV token
 
-def skimlit_model_mk_I(truncation_params,char_samples):
+def get_hyperparameters():
+  return {
+      "char_embedding_output_dim": 64,
+      "token_layer_1_hidden_units":128,
+      "char_bidirectional_lstm_hidden_units":64,
+      "line_number_dense_1_hidden_units":64,
+      "total_line_dense_1_hidden_units":64,
+      "char_token_hybrid_dense_1_hidden_units":256,
+      "char_token_hybrid_dropout_1_probability":0.5,
+      "char_token_hybrid_dense_2_hidden_units":256,
+      "output_layer_hidden_units":5
+  }
+
+def skimlit_model_mk_I(hyperparameters,truncation_params,char_samples):
+    # retrieve hyperparameters
+    char_embedding_output_dim = hyperparameters["char_embedding_output_dim"]
+    token_layer_1_hidden_units = hyperparameters["token_layer_1_hidden_units"]
+    char_bidirectional_lstm_hidden_units =hyperparameters["char_bidirectional_lstm_hidden_units"]
+    line_number_dense_1_hidden_units = hyperparameters["line_number_dense_1_hidden_units"]
+    total_line_dense_1_hidden_units = hyperparameters["total_line_dense_1_hidden_units"]
+    char_token_hybrid_dense_1_hidden_units = hyperparameters["char_token_hybrid_dense_1_hidden_units"]
+    char_token_hybrid_dropout_1_probability = hyperparameters["char_token_hybrid_dropout_1_probability"]
+    char_token_hybrid_dense_2_hidden_units = hyperparameters["char_token_hybrid_dense_2_hidden_units"]
+    output_layer_hidden_units = hyperparameters["output_layer_hidden_units"]
 
     # truncation measures
     line_number_truncation,total_lines_truncation,output_sequence_char_length = truncation_params["line_number_truncation"],truncation_params["total_lines_truncation"],truncation_params["output_sequence_char_length"]
@@ -28,7 +51,7 @@ def skimlit_model_mk_I(truncation_params,char_samples):
 
     char_embedding = layers.Embedding(
         input_dim = len(char_vocab),
-        output_dim = 25,
+        output_dim = char_embedding_output_dim,
         mask_zero = True,
         name = "char_embedding"
     )
@@ -37,37 +60,37 @@ def skimlit_model_mk_I(truncation_params,char_samples):
     # token inputs
     token_inputs = layers.Input(shape = [],dtype = "string",name = "token_inputs")
     token_embeddings = use_embedding_layer(token_inputs)
-    token_outputs = layers.Dense(128,activation = "relu",name = "token_layer_1")(token_embeddings)
+    token_outputs = layers.Dense(token_layer_1_hidden_units,activation = "relu",name = "token_layer_1")(token_embeddings)
     token_model = tf.keras.Model(inputs = token_inputs,outputs = token_outputs)
 
     # char inputs
     char_inputs = layers.Input(shape = (1,),dtype = "string", name = "char_inputs")
     char_vectors  = char_vectorizer(char_inputs)
     char_embeddings = char_embedding(char_vectors)
-    char_bi_lstm = layers.Bidirectional(layers.LSTM(24),name = "char_bidirectional_lstm")(char_embeddings)
+    char_bi_lstm = layers.Bidirectional(layers.LSTM(char_bidirectional_lstm_hidden_units),name = "char_bidirectional_lstm")(char_embeddings)
     char_model = tf.keras.Model(inputs = char_inputs,outputs = char_bi_lstm)
 
     # line numbers model
     line_number_inputs = layers.Input(shape = (line_number_truncation,),dtype = tf.float32,name = "line_number_input")
-    x = layers.Dense(34,activation = "relu",name = "line_number_dense_1")(line_number_inputs)
+    x = layers.Dense(line_number_dense_1_hidden_units,activation = "relu",name = "line_number_dense_1")(line_number_inputs)
     line_number_model = tf.keras.Model(inputs = line_number_inputs,outputs = x)
 
     # total lines model
     total_lines_inputs = layers.Input(shape = (total_lines_truncation,),dtype = tf.float32, name = "total_lines_input")
-    y = layers.Dense(32,activation = "relu",name = "total_line_dense_1")(total_lines_inputs)
+    y = layers.Dense(total_line_dense_1_hidden_units,activation = "relu",name = "total_line_dense_1")(total_lines_inputs)
     total_lines_model = tf.keras.Model(inputs = total_lines_inputs, outputs = y)
 
     # combine token and char embeddings into a hybrid embedding
     combined_embeddings = layers.Concatenate(name = "char_token_hybrid_embedding")([token_model.output,char_model.output])
-    z = layers.Dense(256,activation = "relu",name = "char_token_hybrid_dense_1")(combined_embeddings)
-    z = layers.Dropout(0.5,name = "char_token_hybrid_dropout_1")(z)
-    z = layers.Dense(256,activation = "relu",name = "char_token_hybrid_dense_2")(z)
+    z = layers.Dense(char_token_hybrid_dense_1_hidden_units,activation = "relu",name = "char_token_hybrid_dense_1")(combined_embeddings)
+    z = layers.Dropout(char_token_hybrid_dropout_1_probability,name = "char_token_hybrid_dropout_1")(z)
+    z = layers.Dense(char_token_hybrid_dense_2_hidden_units,activation = "relu",name = "char_token_hybrid_dense_2")(z)
 
     # combine positional embeddings with combined token and char embeddings
     tribrid_embeddings = layers.Concatenate(name = "char_token_positional_embeddings")([line_number_model.output,total_lines_model.output,z])
 
     # create output layer
-    output_layer = layers.Dense(5,activation = "softmax",name = "output_layer")(tribrid_embeddings)
+    output_layer = layers.Dense(output_layer_hidden_units,activation = "softmax",name = "output_layer")(tribrid_embeddings)
 
     # put together model with all the inputs
     model = tf.keras.Model(
