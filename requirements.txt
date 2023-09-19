@@ -1,20 +1,4 @@
-# modules dependencies
 pandas==1.5.3
 numpy==1.23.5
 scikit-learn==1.2.2
-
-# tensorflow-gpu
-setuptools==65.5.0
-future==0.18.2
-future==0.18.2
-keras_preprocessing==1.1.2
-keras_applications==1.0.8 
-gast==0.4.0 
-protobuf 
-pybind11 
-cython 
-pkgconfig 
-packaging 
-h5py==3.6.0
-https://developer.download.nvidia.com/compute/redist/jp/v502 
-tensorflow-gpu==2.9.1+nv22.09
+tensorflow
