@@ -14,7 +14,7 @@ if __name__ == '__main__':
 
     # model_save_name 
     date = datetime.now().strftime("%m/%d/%Y, %H:%M:%S").replace(",","").replace(" ","_").replace(":","_").replace("/","_")
-    model_save_name = f"skimlit_model_{date}.h5"
+    model_save_name = f"skimlit_model_{date}."
 
     # choose the batch size to create the datasets
     BATCH_SIZE = 32
