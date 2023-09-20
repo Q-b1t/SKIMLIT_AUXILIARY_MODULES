@@ -1,4 +1,4 @@
-from sklearn.metrics import accuracy_score,precision_recall_fscore_support
+from sklearn.metrics import accuracy_score,precision_recall_fscore_support # keep this import the first one (https://stackoverflow.com/questions/67735216/after-using-pip-i-get-the-error-scikit-learn-has-not-been-built-correctly)
 
 def calculate_results(y_true,y_pred):
   # calculate model accuracy

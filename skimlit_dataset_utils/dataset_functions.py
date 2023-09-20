@@ -1,7 +1,8 @@
+from sklearn.preprocessing import OneHotEncoder # keep this import the first one (https://stackoverflow.com/questions/67735216/after-using-pip-i-get-the-error-scikit-learn-has-not-been-built-correctly)
 import pandas as pd
 import numpy as np
 import tensorflow as tf
-from sklearn.preprocessing import OneHotEncoder
+
 
 def get_lines(filename):
   with open(filename,"r") as f:

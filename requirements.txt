@@ -1,4 +1,5 @@
-pandas
-numpy
-scikit-learn 
-tensorflow
+pandas==1.5.3
+numpy==1.23.5
+scikit-learn==1.2.2
+tensorflow==2.13.0
+tensorflow_hub==0.14.0
