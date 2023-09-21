@@ -3,3 +3,4 @@ pubmed-rct
 skimlit_dataset_utils/__pycache__/*
 skimlit_evaluation_utils/__pycache__/*
 skimlit_model_versions/__pycache__/*
+use_pretrained_encoder
