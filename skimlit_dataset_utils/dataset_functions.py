@@ -10,8 +10,15 @@ def get_lines(filename):
   f.close()
   return text
 
-def process_text_with_line_numbers(filename):
+def process_text_with_line_numbers(filename,percentage = -1):
   input_lines = get_lines(filename)
+
+  # cut the lines to the required percentage
+  if percentage != -1 and (percentage > 0.0 and  percentage  <= 1.0 ):
+    cut_index = int(len(input_lines) * percentage)
+    input_lines = input_lines[:cut_index]
+  
+  
   abstract_lines = ""
   abstract_samples = list()
   # loop through the lines
