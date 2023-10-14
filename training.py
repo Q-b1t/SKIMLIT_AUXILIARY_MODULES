@@ -16,6 +16,9 @@ if __name__ == '__main__':
     date = datetime.now().strftime("%m/%d/%Y, %H:%M:%S").replace(",","").replace(" ","_").replace(":","_").replace("/","_")
     model_save_name = f"skimlit_model_{date}."
 
+    # use pretrained embedding layer path
+    use_path = "use_pretrained_encoder/universal_sentence_encoder_pretrained.keras"
+
     # choose the batch size to create the datasets
     BATCH_SIZE = 32
 
@@ -40,7 +43,7 @@ if __name__ == '__main__':
     truncation_data = get_truncation_values(raw_data)
 
     # instace the model
-    skimlit_model = skimlit_model_mk_I(get_hyperparameters(),truncation_data,training_chars)
+    skimlit_model = skimlit_model_mk_II(get_hyperparameters(),truncation_data,training_chars,use_path)
 
     # compile the model
     skimlit_model.compile(
